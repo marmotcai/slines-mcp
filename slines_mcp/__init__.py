@@ -1,0 +1,10 @@
+# -*- coding: utf-8 -*-
+from . import server
+import asyncio
+
+def run():
+    """Main entry point for the package."""
+    asyncio.run(server.main())
+
+# Expose important items at package level
+__all__ = ['run', 'server']
