@@ -7,4 +7,4 @@ def run():
     asyncio.run(server.main())
 
 # Expose important items at package level
-__all__ = ['run', 'server']
+__all__ = ['run']

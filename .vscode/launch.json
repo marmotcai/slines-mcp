@@ -13,21 +13,6 @@
             "console": "integratedTerminal"
         },
         {
-            "name": "Debug MCP Service",
-            "type": "debugpy",
-            "request": "launch",
-            "module": "mcp_tool.main",  // 替换为你的实际模块路径
-            "args": [
-              "--transport", "sse",
-              "--port", "8000"
-            ],
-            "cwd": "${workspaceFolder}",
-            "env": {
-              "PYTHONPATH": "${workspaceFolder}/slines_mcp"  // 若代码在 src 目录下
-            },
-            "justMyCode": false  // 允许进入第三方库代码
-        },
-        {
             "name": "Python: 启动主服务",
             "type": "debugpy",
             "request": "launch",
@@ -35,11 +20,25 @@
             "cwd": "${workspaceFolder}",       
             "console": "integratedTerminal",
             "env": {
-            },            
+            },
             "args": [
                 "--transport", "sse",
                 "--port", "8000"
-            ],
+            ]
+        },
+        {
+            "name": "Python: 启动数据集MCP",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/slines_mcp/dataset.py",
+            "cwd": "${workspaceFolder}/slines_mcp",       
+            "console": "integratedTerminal",
+            "env": {
+            },
+            "args": [
+                "--transport", "sse",
+                "--port", "8000"
+            ]
         }
     ]
 }
