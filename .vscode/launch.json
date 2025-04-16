@@ -39,6 +39,21 @@
                 "--transport", "sse",
                 "--port", "8000"
             ]
+        },
+        {
+            "name": "Python: 启动UI",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/slines_mcp/ui/ui.py",
+            "cwd": "${workspaceFolder}/slines_mcp/ui/",       
+            "console": "integratedTerminal",
+            "env": {
+                "OLLAMA_HOST": "http://10.213.84.13:20034",
+                "GRADIO_SERVER_NAME": "0.0.0.0",
+                "GRADIO_SERVER_PORT": "7860"
+            },
+            "args": [
+            ]
         }
     ]
 }

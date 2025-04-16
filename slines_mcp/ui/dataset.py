@@ -62,8 +62,8 @@ def serialize_document(doc):
     else:
         return str(doc) 
     
-@mcp.tool(description="Get summary overview information of the dataset")
-async def dataset_overview() -> str:
+@mcp.tool(name = "get_overview", description="Get summary overview information of the dataset")
+async def get_overview() -> str:
     query = {"SiteName": {"$ne": None}}
     _, site_names = mongo_query(mongo_url = mongo_url, query = query)
     results = {
@@ -72,8 +72,8 @@ async def dataset_overview() -> str:
     }
     return json.dumps(results, indent=2)
     
-@mcp.tool(name = "search", description="search dataset of a site")
-async def dataset_search(site_name: Union[dict, str], count: int) -> str:
+@mcp.tool(name = "search_dataset", description="search dataset of a site")
+async def search_dataset(site_name: Union[dict, str], count: int) -> str:
     query = {"SiteName": site_name}
     _, site_data = mongo_query(collection = collection, query = query)
     site_data = list(site_data)[:count]
@@ -142,4 +142,4 @@ async def dataset_search(site_name: Union[dict, str], count: int) -> str:
 #         return f"Error: {str(e)}"
 
 if __name__ == "__main__":
-    mcp.run(transport="sse")
+    mcp.run(transport="stdio")

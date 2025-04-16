@@ -1,0 +1,47 @@
+x-base: &base
+  restart: always
+
+x-volumes: &volumes
+  volumes:
+    - /etc/localtime:/etc/localtime:ro
+    - /etc/hosts:/etc/hosts
+
+x-networks: &networks
+  networks:
+    - default
+
+services:
+
+  # mcpserver:
+  #   <<: [*base, *volumes]
+  #   build:
+  #     context: .
+  #     dockerfile: ./docker/Dockerfile
+  #     args:
+  #       BASE_IMAGE: ${PYTHON_BASE_IMAGE}
+  #   image: ${IMAGE_REGISTRY_NAME}/${IMAGE_NAME}:${VERSION}
+  #   container_name: ${CONTAINER_NAME}_${VERSION}
+  #   profiles:
+  #     - all
+  #   environment:
+  #     MODE: keep
+  #   volumes:
+  #     - ./:/app
+  #   ports:
+  #     - "${EXPOSE_PORT}:8000"
+
+  ui:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile-ui
+    image: ${IMAGE_REGISTRY_NAME}/${IMAGE_NAME}_ui:${VERSION}
+    container_name: ${CONTAINER_NAME}_ui_${VERSION}
+    volumes:
+      - ../slines_mcp/ui:/app
+    ports:
+      - "7860:7860"
+    environment:
+    - MODE=keep
+    - OLLAMA_HOST=${OLLAMA_HOST}
+    - GRADIO_SERVER_NAME=0.0.0.0
+    - GRADIO_SERVER_PORT=7860

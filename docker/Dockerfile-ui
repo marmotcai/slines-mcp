@@ -1,0 +1,16 @@
+ARG BASE_IMAGE=python:3.10-slim
+FROM ${BASE_IMAGE}
+
+LABEL maintainer="marmotcai@163.com"
+
+# Set working directory
+WORKDIR /app
+COPY ./slines_mcp/ui .
+
+RUN pip install --upgrade pip
+RUN pip install --no-cache-dir -r requirement.txt
+
+EXPOSE 7860
+# You can switch to Ollama by adding the ollama client if needed
+
+CMD ["bash", "entrypoint.sh"]

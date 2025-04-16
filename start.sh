@@ -62,7 +62,7 @@ while getopts "s:t:h" opt; do
         fi
 
         # 动态构建命令
-        base_cmd="docker-compose --env-file ${base_env_file} --profile $profile -f ./docker-compost.yaml"
+        base_cmd="docker-compose --env-file ${base_env_file} --profile $profile -f ./docker/docker-compost.yaml"
         [ "$action" = "build" ] && base_cmd+=" --project-directory ${MAIN_DIR} up --build"
         [ "$action" = "up" ] && base_cmd+=" up"
         [ "$action" = "upd" ] && base_cmd+=" up -d"
