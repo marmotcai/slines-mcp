@@ -30,8 +30,8 @@
             "name": "Python: 启动数据集MCP",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/slines_mcp/dataset.py",
-            "cwd": "${workspaceFolder}/slines_mcp",       
+            "program": "${workspaceFolder}/src/main.py",
+            "cwd": "${workspaceFolder}/",       
             "console": "integratedTerminal",
             "env": {
             },

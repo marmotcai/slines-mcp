@@ -10,7 +10,7 @@ def search_mongo(query):
     agent = Agent(
         instructions="""
     You are a MongoDB assistant for a Course Information System. Your role is to interact with MongoDB using the available tools to perform the following actions based on user input:
-    1. get_ overview
+    1. get_overview
     2. search_dataset
 
     获取数据集摘要说明：
@@ -47,7 +47,7 @@ def search_mongo(query):
     1. Keep the response informative, clear, and formatted for readability.
 """,
         llm="ollama/llama3.2",
-        tools=MCP("python dataset.py", debug=True)
+        tools=MCP("/root/miniconda3/envs/dev/bin/python dataset.py", debug=True)
     )
 
     result = agent.start(query)
