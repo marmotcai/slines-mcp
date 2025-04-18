@@ -31,7 +31,7 @@
             "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/src/main.py",
-            "cwd": "${workspaceFolder}/",       
+            "cwd": "${workspaceFolder}/",
             "console": "integratedTerminal",
             "env": {
             },
@@ -44,8 +44,8 @@
             "name": "Python: 启动UI",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/slines_mcp/ui/ui.py",
-            "cwd": "${workspaceFolder}/slines_mcp/ui/",       
+            "program": "${workspaceFolder}/src/webui.py",
+            "cwd": "${workspaceFolder}/",       
             "console": "integratedTerminal",
             "env": {
                 "OLLAMA_HOST": "http://10.213.84.13:20034",

@@ -66,6 +66,20 @@ tools = [
             },
         ),
         types.Tool(
+            name="dataset_count_documents",
+            description="Count the number of documents in a dataset in a collection.",
+            inputSchema={
+                "type": "object",
+                "required": ["SiteName"],
+                "properties": {
+                    "SiteName": {
+                        "type": "string",
+                        "description": "站点名称",
+                    }
+                },
+            },
+        ),
+        types.Tool(
             name="dataset_find",
             description="Find multiple documents in a collection.",
             inputSchema={
@@ -79,6 +93,25 @@ tools = [
                     "limit": {
                         "type": "integer",
                         "description": "限制返回的文档数量",
+                    }
+                },
+            },
+        ),
+        types.Tool(
+            name="dataset_search_title",
+            description="Search documents by title using fuzzy matching",
+            inputSchema={
+                "type": "object",
+                "required": ["title"],
+                "properties": {
+                    "title": {
+                        "type": "string",
+                        "description": "要搜索的标题关键词",
+                    },
+                    "limit": {
+                        "type": "integer",
+                        "description": "限制返回的文档数量",
+                        "default": 10
                     }
                 },
             },
@@ -123,13 +156,35 @@ def serialize_document(doc):
     else:
         return str(doc)
     
-def dataset_overview(
-    ) -> list[types.TextContent]:
+def dataset_overview(collection_name = "file_info", field = "SiteName") -> list[types.TextContent]:
     overview = mongo_interface.distinct(
                     collection_name="file_info",
                     field="SiteName"
                 )
     return [types.TextContent(type="text", text=str(overview))]
+
+def dataset_count_documents(SiteName: str = "") -> types.TextContent:
+    query = {"SiteName": SiteName}
+    count = mongo_interface.count_documents(
+        collection_name = "file_info",
+        query = query)
+    
+    return [types.TextContent(type="text", text=str(count))]
+
+def dataset_search_title(
+    title: str,
+    limit: int = 10
+) -> list[types.TextContent]:
+    # 构建模糊查询的正则表达式
+    query = {"Title": {"$regex": title, "$options": "i"}}
+    
+    results = mongo_interface.find_many(
+        collection_name="file_info",
+        query=query,
+        limit=limit
+    )
+    
+    return [types.TextContent(type="text", text=str([serialize_document(doc) for doc in results]))]
 
 def dataset_find(
         query: Union[dict, str],
@@ -151,10 +206,10 @@ def dataset_find(
     help="Transport type",
 )
 def main(port: int, transport: str) -> int:
-    app = Server("mcp-website-fetcher")
+    app = Server("slines-mcp")
 
     @app.call_tool()
-    async def fetch_tool(
+    async def call_tool_as_name(
         name: str, arguments: dict
     ) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:        
         tool = tools_pool.get(name)
@@ -174,6 +229,14 @@ def main(port: int, transport: str) -> int:
             return [types.TextContent(type="text", text=content)]
         elif name == "dataset_overview":
             return dataset_overview()
+        elif name == "dataset_count_documents":
+            return dataset_count_documents(SiteName=arguments.get("SiteName", None))
+        elif name == "dataset_search_title":
+            title = arguments.get("title")
+            if not title:
+                raise ValueError("Missing required argument 'title'")
+            limit = arguments.get("limit", 10)
+            return dataset_search_title(title, limit)        
         elif name == "dataset_find":
             query = {"SiteName": arguments.get("query", None)}
             limit = arguments.get("limit", 0)
