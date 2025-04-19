@@ -41,6 +41,20 @@
             ]
         },
         {
+            "name": "Python: 启动运维MCP",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/mcpserver_devops/main.py",
+            "cwd": "${workspaceFolder}/src/mcpserver_devops/",
+            "console": "integratedTerminal",
+            "env": {
+            },
+            "args": [
+                "--transport", "sse",
+                "--port", "8000"
+            ]
+        },
+        {
             "name": "Python: 启动UI",
             "type": "debugpy",
             "request": "launch",
