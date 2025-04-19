@@ -22,6 +22,7 @@ dependencies = [
     "click>=8.1.0",
     "httpx>=0.27",
     "mcp",
+    "requests>=2.32.3",
 ]
 
 [project.scripts]
@@ -49,3 +50,7 @@ target-version = "py310"
 
 [tool.uv]
 dev-dependencies = ["pyright>=1.1.378", "pytest>=8.3.3", "ruff>=0.6.9"]
+
+[[tool.uv.index]]
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+default = true

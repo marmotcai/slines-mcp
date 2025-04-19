@@ -44,8 +44,8 @@
             "name": "Python: 启动运维MCP",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/src/mcpserver_devops/main.py",
-            "cwd": "${workspaceFolder}/src/mcpserver_devops/",
+            "program": "${workspaceFolder}/src/mcpserver_ops/server.py",
+            "cwd": "${workspaceFolder}/src/mcpserver_ops/",
             "console": "integratedTerminal",
             "env": {
             },

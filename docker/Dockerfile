@@ -1,10 +1,7 @@
 ARG BASE_IMAGE=python:3.10-slim
-FROM ${BASE_IMAGE}
+FROM ${BASE_IMAGE} AS base
 
 LABEL maintainer="marmotcai@163.com"
-
-# Set working directory
-WORKDIR /app
 
 #######################################################
 
@@ -20,6 +17,8 @@ RUN pip config set global.index-url ${PIP_MIRRORS_URL}
 RUN python -m pip install --upgrade pip && \
     pip install uv
 
+RUN uv venv /root/.venv && echo '. /root/.venv/bin/activate' >> ~/.bashrc
+
 # Install MCP SDK directly from GitHub repository
 # RUN pip install git+https://github.com/modelcontextprotocol/python-sdk.git
 
@@ -27,11 +26,19 @@ RUN python -m pip install --upgrade pip && \
 # COPY requirements.txt .
 # RUN pip install -r requirements.txt
 
+#################################################################################
+
+FROM base AS dev
+
+ARG APP_NAME=
+WORKDIR /app
+
 # Copy source code into container
-COPY . .
-RUN uv venv /root/.venv && echo '. /root/.venv/bin/activate' >> ~/.bashrc
+COPY ./src/${APP_NAME}/ .
 RUN . /root/.venv/bin/activate && \
     uv pip install -r requirements.txt
+
+COPY ./src/entrypoint.sh /root/entrypoint.sh
 # RUN uv pip install -e .
 
-CMD ["bash", "entrypoint.sh"]
+CMD ["bash", "/root/entrypoint.sh"]
