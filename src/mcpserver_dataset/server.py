@@ -9,8 +9,7 @@ from pydantic import BaseModel
 from typing import Optional
 from typing import Union, Optional
 
-from .dataset import MongoDBInterface
-
+from dataset.mongodb import MongoDBInterface
 
 mongo_url = 'mongodb://root:Suwell123@10.213.84.11:27117'
 # Initialize MongoDBInterface

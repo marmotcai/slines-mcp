@@ -3,8 +3,13 @@ import gradio as gr
 import litellm
 import os
 
+# from litellm import completion
+# response = completion(model="ollama/deepseek-r1:14b", messages=[{ "content": "respond in 20 words. who are you?","role": "user"}], api_base=os.environ.get("OLLAMA_HOST"))
+# print(response)
+
 # litellm.api_base="http://ollama-llm:11434"
 litellm.api_base=os.environ.get("OLLAMA_HOST")
+
 instructions="""
     你是一个数据集查询助手, 您的角色是使用可用工具与数据集进行交互，根据用户输入执行以下操作：
     1. dataset_overview 
@@ -32,13 +37,13 @@ instructions="""
     1.保持回复信息丰富、清晰、格式清晰，便于阅读。
 """
 
-# instructions = "你是一个数据集的处理助手,请使用工具完成用户的请求"
+instructions = "你是一个助手,请使用工具完成用户的请求"
 def search_mongo(query):
     print(f"Current working directory: {os.getcwd()}")
     agent = Agent(
         instructions=instructions,
-        llm="ollama/deepseek-r1:1.5b",
-        tools=MCP("/root/miniconda3/envs/dev/bin/python /root/devspace/slines-mcp/src/main.py", debug=True)
+        llm="ollama/deepseek-r1:14b",
+        tools=MCP("/opt/miniconda3/envs/dev/bin/python /Users/andrewcai/devspaces/slines-mcp/src/mcpserver_ops/main.py", debug=True)
     )
 
     result = agent.start(query)
@@ -46,10 +51,10 @@ def search_mongo(query):
 
 demo = gr.Interface(
     fn=search_mongo,
-    inputs=gr.Textbox(placeholder="List out all courses..."),
-    outputs=gr.Markdown(value="## Welcome to JU-CSE BSc Course Information System\n\nHello! I'm here to assist you with course information. Please enter a query like 'List out all courses', 'Insert a course', or 'Delete a course with code CSE 100' to get started."),
-    title="JU-CSE BSc Course Information System",
-    description="Enter your query below:"
+    inputs=gr.Textbox(placeholder="查询服务器100.126.229.5上运行的容器..."),
+    outputs=gr.Markdown(value="## 欢迎使用远程服务器管理工具\n\n你好我是来帮你管理服务器的。请输入一个类似于“查询服务器100.126.229.5上运行的容器”的查询即可开始。"),
+    title="远程服务器管理工具",
+    description="在下面输入您的查询："
 )
 
 if __name__ == "__main__":

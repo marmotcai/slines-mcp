@@ -15,27 +15,40 @@ import paramiko
 
 #################################################################################################
 # Initialize SSH client
-
 ssh_client = paramiko.SSHClient()
 ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
 # Function to execute remote command via SSH
-def execute_remote_command(command: str) -> Tuple[str, str]:
+def execute_command(command: str) -> Tuple[str, str]:
     try:
         stdin, stdout, stderr = ssh_client.exec_command(command)
         return stdout.read().decode('utf-8'), stderr.read().decode('utf-8')
     except Exception as e:
         logger.error(f"Error executing remote command: {e}")
         return "", str(e)
+
 # Function to connect to remote server via SSH
-def connect_to_remote_server(hostname: str, username: str, password: str) -> bool:
+def connect_to_remote_server(hostname: str, port: int = 22, username: str = "root", password: str = None, key_path: str = os.path.expanduser("~/.ssh/id_ed25519")) -> bool:
     try:
-        ssh_client.connect(hostname=hostname, username=username, password=password)
-        logger.info("Successfully connected to remote server via SSH")
+        if username and password:
+            ssh_client.connect(hostname=hostname, port=port, username=username, password=password)
+            logger.info("Successfully connected to remote server via SSH using username and password")
+        elif key_path:
+            # 自动判断密钥类型
+            if key_path.endswith("id_ed25519"):
+                pkey = paramiko.Ed25519Key.from_private_key_file(key_path)
+            else:
+                pkey = paramiko.RSAKey.from_private_key_file(key_path)
+            ssh_client.connect(hostname=hostname, port=port, username=username, pkey=pkey)
+            logger.info("Successfully connected to remote server via SSH using private key")
+        else:
+            logger.error("No valid authentication method provided")
+            return False
         return True
     except Exception as e:
         logger.error(f"Failed to connect to remote server via SSH: {e}")
         return False
-    
+
 # Function to disconnect from remote server
 def disconnect_from_remote_server():
     try:
@@ -52,12 +65,8 @@ logger = logging.getLogger("docker-mcp")
 # Initialize FastMCP server
 mcp = FastMCP("docker")
 
-#
-# Container Tools
-#
-
 @mcp.tool()
-async def remote_list_containers(hostname: str, username: str, password: str, show_all: bool = False) -> str:
+async def execute_remote_command(command: str, hostname: str, port: int = 22, username: str = None, password: str = None) -> str:
     """List all containers or only running ones on a remote server.
     
     Args:
@@ -69,11 +78,38 @@ async def remote_list_containers(hostname: str, username: str, password: str, sh
     Returns:
         String representation of containers list.
     """
-    if not connect_to_remote_server(hostname, username, password):
+    if not connect_to_remote_server(hostname, port, username, password):
+        return "Failed to connect to remote server"
+
+    stdout, stderr = execute_command(command)
+    
+    disconnect_from_remote_server()
+    
+    if stderr:
+        return f"Error listing containers: {stderr}"
+    return stdout
+#
+# Container Tools
+#
+
+@mcp.tool()
+async def remote_list_containers(hostname: str, port: int = 22, username: str = "root", password: str = None, show_all: bool = False) -> str:
+    """List all containers or only running ones on a remote server.
+    
+    Args:
+        hostname: Hostname or IP address of the remote server.
+        username: Username for SSH authentication.
+        password: Password for SSH authentication.
+        show_all: If True, show all containers including stopped ones. Default: False.
+    
+    Returns:
+        String representation of containers list.
+    """
+    if not connect_to_remote_server(hostname, port, username, password):
         return "Failed to connect to remote server"
     
     command = "docker ps -a" if show_all else "docker ps"
-    stdout, stderr = execute_remote_command(command)
+    stdout, stderr = execute_command(command)
     
     disconnect_from_remote_server()
     
@@ -82,7 +118,7 @@ async def remote_list_containers(hostname: str, username: str, password: str, sh
     return stdout
 
 @mcp.tool()
-async def remote_fetch_container_logs(hostname: str, username: str, password: str, container_id: str, tail: int = 100) -> str:
+async def remote_fetch_container_logs(container_id: str, hostname: str, port: int = 22, username: str = None, password: str = None) -> str:
     """List all containers or only running ones on a remote server.
     
     Args:
@@ -94,11 +130,11 @@ async def remote_fetch_container_logs(hostname: str, username: str, password: st
     Returns:
         String representation of containers list.
     """
-    if not connect_to_remote_server(hostname, username, password):
+    if not connect_to_remote_server(hostname, port, username, password):
         return "Failed to connect to remote server"
     
     command = f"docker logs --tail {tail} {container_id}"
-    stdout, stderr = execute_remote_command(command)
+    stdout, stderr = execute_command(command)
     
     disconnect_from_remote_server()
     
