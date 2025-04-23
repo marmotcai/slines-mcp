@@ -204,7 +204,7 @@ def dataset_find(
     default="stdio",
     help="Transport type",
 )
-def main(port: int, transport: str) -> int:
+def main(transport: str, port: int = 8000) -> int:
     app = Server("slines-mcp")
 
     @app.call_tool()

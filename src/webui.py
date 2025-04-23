@@ -36,6 +36,9 @@ instructions="""
     重要规则：
     1.保持回复信息丰富、清晰、格式清晰，便于阅读。
 """
+current_file_path = os.path.abspath(__file__)
+python_path = os.path.join("/root/miniconda3/envs/dev/bin/python")
+main_path = os.path.join(os.path.dirname(current_file_path), "mcpserver_ops", "main.py")
 
 instructions = "你是一个助手,请使用工具完成用户的请求"
 def search_mongo(query):
@@ -43,7 +46,7 @@ def search_mongo(query):
     agent = Agent(
         instructions=instructions,
         llm="ollama/deepseek-r1:14b",
-        tools=MCP("/opt/miniconda3/envs/dev/bin/python /Users/andrewcai/devspaces/slines-mcp/src/mcpserver_ops/main.py", debug=True)
+        tools=MCP(f"{python_path} {main_path}", debug=True)
     )
 
     result = agent.start(query)
@@ -51,8 +54,8 @@ def search_mongo(query):
 
 demo = gr.Interface(
     fn=search_mongo,
-    inputs=gr.Textbox(placeholder="查询服务器100.126.229.5上运行的容器..."),
-    outputs=gr.Markdown(value="## 欢迎使用远程服务器管理工具\n\n你好我是来帮你管理服务器的。请输入一个类似于“查询服务器100.126.229.5上运行的容器”的查询即可开始。"),
+    inputs=gr.Textbox(placeholder="查询服务器xx.xx.xx.xx上运行的容器..."),
+    outputs=gr.Markdown(value="## 欢迎使用远程服务器管理工具\n\n你好我是来帮你管理服务器的。请输入一个类似于“查询服务器10.213.84.78上运行的容器”的查询即可开始。"),
     title="远程服务器管理工具",
     description="在下面输入您的查询："
 )

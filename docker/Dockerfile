@@ -19,9 +19,6 @@ RUN python -m pip install --upgrade pip && \
 
 RUN uv venv /root/.venv && echo '. /root/.venv/bin/activate' >> ~/.bashrc
 
-# Install MCP SDK directly from GitHub repository
-# RUN pip install git+https://github.com/modelcontextprotocol/python-sdk.git
-
 # Install project Python dependencies
 # COPY requirements.txt .
 # RUN pip install -r requirements.txt
@@ -39,6 +36,5 @@ RUN . /root/.venv/bin/activate && \
     uv pip install -r requirements.txt
 
 COPY ./src/entrypoint.sh /root/entrypoint.sh
-# RUN uv pip install -e .
 
 CMD ["bash", "/root/entrypoint.sh"]

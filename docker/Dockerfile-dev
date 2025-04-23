@@ -1,0 +1,26 @@
+ARG BASE_IMAGE=python:3.10-slim
+FROM ${BASE_IMAGE} AS base
+
+LABEL maintainer="marmotcai@163.com"
+
+#######################################################
+
+RUN sed -i 's|deb.debian.org|mirrors.aliyun.com|g' /etc/apt/sources.list.d/debian.sources
+RUN apt-get update && apt-get install -y \
+    procps iputils-ping net-tools vim git
+
+#######################################################
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y ffmpeg
+
+RUN git clone --branch v0.12.32 https://github.com/run-llama/llama_index.git
+RUN pip install -e ./llama_index
+
+RUN git clone --branch v1.6.0 https://github.com/modelcontextprotocol/python-sdk.git
+RUN pip install -e ./python-sdk
+
+COPY ./src/entrypoint.sh /root/entrypoint.sh
+
+CMD ["bash", "/root/entrypoint.sh"]

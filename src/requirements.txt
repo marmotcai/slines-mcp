@@ -1,0 +1,5 @@
+anyio>=4.5
+click>=8.1.0
+httpx>=0.27
+mcp>=1.6.0
+praisonaiagents>=0.0.67

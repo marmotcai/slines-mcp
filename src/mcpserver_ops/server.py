@@ -29,25 +29,31 @@ def execute_command(command: str) -> Tuple[str, str]:
 
 # Function to connect to remote server via SSH
 def connect_to_remote_server(hostname: str, port: int = 22, username: str = "root", password: str = None, key_path: str = os.path.expanduser("~/.ssh/id_ed25519")) -> bool:
+    def load_private_key(path: str):
+        return paramiko.Ed25519Key.from_private_key_file(path) if path.endswith("id_ed25519") else paramiko.RSAKey.from_private_key_file(path)
+
     try:
+        if key_path:
+            try:
+                ssh_client.connect(hostname=hostname, port=port, username=username, pkey=load_private_key(key_path))
+                logger.info("Successfully connected to remote server via SSH using private key")
+                return True
+            except Exception as e:
+                logger.warning(f"Failed to connect using private key: {e}")
+
         if username and password:
-            ssh_client.connect(hostname=hostname, port=port, username=username, password=password)
-            logger.info("Successfully connected to remote server via SSH using username and password")
-        elif key_path:
-            # 自动判断密钥类型
-            if key_path.endswith("id_ed25519"):
-                pkey = paramiko.Ed25519Key.from_private_key_file(key_path)
-            else:
-                pkey = paramiko.RSAKey.from_private_key_file(key_path)
-            ssh_client.connect(hostname=hostname, port=port, username=username, pkey=pkey)
-            logger.info("Successfully connected to remote server via SSH using private key")
+            try:
+                os.system(f"apt install -y sshpass && sshpass -p '{password}' ssh-copy-id -i {key_path} -p {port} {username}@{hostname}")
+                ssh_client.connect(hostname=hostname, port=port, username=username, pkey=load_private_key(key_path))
+                logger.info("Successfully connected to remote server via SSH using private key after copying")
+                return True
+            except Exception as e:
+                logger.error(f"Failed to connect using private key after copying: {e}")
         else:
             logger.error("No valid authentication method provided")
-            return False
-        return True
     except Exception as e:
         logger.error(f"Failed to connect to remote server via SSH: {e}")
-        return False
+    return False
 
 # Function to disconnect from remote server
 def disconnect_from_remote_server():
@@ -63,7 +69,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("docker-mcp")
 
 # Initialize FastMCP server
-mcp = FastMCP("docker")
+mcp = FastMCP("slines_mcp")
 
 @mcp.tool()
 async def execute_remote_command(command: str, hostname: str, port: int = 22, username: str = None, password: str = None) -> str:

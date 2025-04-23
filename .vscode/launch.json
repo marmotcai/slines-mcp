@@ -13,6 +13,23 @@
             "console": "integratedTerminal"
         },
         {
+            "name": "Python: 启动格式转换",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/markit_mcp/markitdown_mcp/__main__.py",
+            "cwd": "${workspaceFolder}/src/markit_mcp/markitdown_mcp/",
+            "console": "integratedTerminal",
+            "env": {
+            },
+            "args": [
+                "--sse",
+                "--host",
+                "0.0.0.0",
+                "--port",
+                "3000"
+            ]
+        },
+        {
             "name": "Python: 启动数据集MCP",
             "type": "debugpy",
             "request": "launch",
@@ -23,7 +40,6 @@
             },
             "args": [
                 "--transport", "sse",
-                "--port", "8000"
             ]
         },
         {
@@ -37,7 +53,6 @@
             },
             "args": [
                 "--transport", "sse",
-                "--port", "8000"
             ]
         },
         {
@@ -48,7 +63,7 @@
             "cwd": "${workspaceFolder}/",       
             "console": "integratedTerminal",
             "env": {
-                "OLLAMA_HOST": "http://localhost:11434",
+                "OLLAMA_HOST": "http://10.213.84.13:20034",
                 "GRADIO_SERVER_NAME": "0.0.0.0",
                 "GRADIO_SERVER_PORT": "7860"
             },
